@@ -1,3 +1,4 @@
+//array of quiz questions with choices and answers
 let questions = [
     {
         question: "Who is the Main Character in One Piece?",
@@ -23,21 +24,26 @@ let quizChoices = document.getElementById("choices");
 let initials = document.getElementById("initials");
 let saveScoreButton = document.getElementById("save-score");
 let timerEl = document.getElementById("timer");
-let timeLeft = 90
+let form = document.getElementById("result-container");
+
+//initialize variables for the quiz
+let timeLeft = 60
 let currentQuestion = 0
 let score = 0
 let timer;
-let saveScore;
 
+//mouse click event listeners
 startButton.addEventListener("click", startQuiz);
 saveScoreButton.addEventListener("click", saveScore);
 
+//starts quiz
 function startQuiz(e) {
     startButton.classList.add("hide");
     startTimer();
     displayQuestion();
 }
 
+//starts timer
 function startTimer() {
     timer = setInterval(function () {
         timeLeft--;
@@ -48,6 +54,7 @@ function startTimer() {
     }, 1000)
 }
 
+//displays current question
 function displayQuestion() {
     quizQuestions.textContent = questions[currentQuestion].question;
     quizChoices.innerHTML = "";
@@ -61,14 +68,17 @@ function displayQuestion() {
     }
 }
 
+//checks if answer is correct or incorrect
 function checkAnswer() {
     console.log(this.textContent);
     if (this.textContent === questions[currentQuestion].answer) {
         console.log("Correct!");
+        alert("Correct!");
         score++;
     } else {
         console.log("Incorrect!");
-        timeLeft -= 5
+        alert("Incorrect");
+        timeLeft -= 10
     }
     currentQuestion++;
     if (currentQuestion >= questions.length) {
@@ -78,6 +88,7 @@ function checkAnswer() {
     }
 }
 
+//when the quiz is ended, display scores
 function endQuiz() {
     console.log("Game Over");
     clearInterval(timer);
@@ -86,14 +97,45 @@ function endQuiz() {
     quizChoices.innerHTML = "";
     timerEl.textContent = "";
     saveScoreButton.disabled = false;
-    displayHighScores();
+    form.removeAttribute("class", "hide")
+    
+    let resultContainer = document.getElementById("result-container");
+    let scoreElement = document.createElement("p");
+    scoreElement.textContent = "Your score: " + score + " out of " + questions.length;
+    resultContainer.appendChild(scoreElement);
+
+    saveScoreButton.disabled = false;
+    form.removeAttribute("class", "hide");
 }
 
+//saves score to local storage
+function saveScore(e) {
+    e.preventDefault()
+    let initialsValue = initials.value.trim();
 
+    if (initialsValue !== "") {
+        let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+        let newScore = {
+            initials: initialsValue,
+            score: score
+        };
+        highScores.push(newScore);
+        localStorage.setItem("highScores", JSON.stringify(highScores));
+        displayHighScores();
+        saveScoreButton.disabled = true;
+    }
+}
+
+//displays scores from highest to lowest
 function displayHighScores() {
+    console.log("High Score");
     let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
     let highScoresContainer = document.getElementById("high-scores");
-    highScoresContainer.innerHTML = ""; // Clear previous scores
+    highScoresContainer.innerHTML = "";
+    console.log(highScores); // Clear previous scores
+
+    //sort high scores
+    highScores.sort((a, b) => b.score - a.score);
 
     for (let i = 0; i < highScores.length; i++) {
         let scoreEntry = document.createElement("p");
@@ -101,5 +143,3 @@ function displayHighScores() {
         highScoresContainer.appendChild(scoreEntry);
     }
 }
-
-
