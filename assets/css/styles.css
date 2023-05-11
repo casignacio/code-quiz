@@ -1,5 +1,21 @@
 /* style.css */
+* {
+  background-color: black;
+  color: white;
+}
+
 .hide {
     display: none;
   }
-  
+
+header,
+title,
+main {
+  display: flexbox;
+  justify-content: center;
+  text-align: center;
+}
+
+ul {
+  list-style-type: none;
+}
